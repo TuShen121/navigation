@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>我的导航页</title>
+		<style type="text/css">
+			#form_1{
+				
+				width: 80%;
+				height: 50px;
+				top: 100px;
+				position: absolute;
+				left: 0;
+				right: 0;
+				margin: auto;
+			}
+			#ipt_ipt{
+				width: 80%;
+				height: 100%;
+				border:1px solid;
+				border-radius:10px;
+			}
+			#ipt_btn{
+				width: 15%;
+				height: 100%;
+			}
+			#div_meanu{
+				
+				width: 80%;
+				
+				border:1px solid;
+				border-radius:10px;
+				
+				position: absolute;
+				left: 0;
+				right: 0;
+				
+				top: 200px;
+				margin: auto;
+				
+			}
+			.son{
+				
+				width: 14%;
+				margin: 5%;
+				float: left;
+			}
+			.son>a>.son_image{
+				width: 100%;
+			}
+			.son>a>.son_name{
+				width: 7%;
+				left: 0;
+				right: 0;
+				margin: auto;
+			}
+			.son>.son_sub_image{
+				width: 40%;
+				display: none;
+			}
+			#add>img{
+				width: 100%;
+			}
+			#sub>img{
+				width: 100%;
+			}
+			#add_more{
+				display: none;
+				background-color: aqua;
+				width: 40%;
+				position: absolute;
+				left: 0;
+				right: 0;
+				margin: auto;
+				margin-top: 200px;
+				padding: 20px;
+			}
+		</style>
+	</head>
+	<body>
+<!-- ==================================搜索框=================================================================		 -->
+		<form id="form_1" action="https://www.baidu.com/s">
+			
+			<input id="ipt_ipt" type="text" name="wd"/>
+			<input id="ipt_btn" type="submit"  value="百度一下"/>
+			
+		</form>
+<!-- ==================================网站图标=================================================================		 -->
+		
+		<div id="div_meanu">
+			<div class="son" v-for="site in sites">
+				
+				<img class="son_sub_image" src="image/jian.jpg" >
+				<a v-bind:href=site.addr>
+					<img class="son_image" v-bind:src=site.addr+"/favicon.ico" >
+					<span class="son_name" >{{site.name}}</span>
+				</a>
+			</div>
+			<div class="son" id="add">
+				<img src="image/add.png" >
+				<span class="son_name" >添加更多</span>
+			</div>
+			<div class="son" id="sub">
+				<img src="image/subtract.png" >
+				<span class="son_name" >删除项目</span>
+			</div>
+		</div>
+<!-- ==================================网站增加框=================================================================		 -->
+		
+		<div id="add_more">
+			<label>网站名称：</label><input type="url" id="add_name" value="" />
+			<br>
+			<label>网站地址：</label><input type="url" id="add_addr" value="http://" />
+			<br>
+			<input type="button" id="no_btn" value="取消" />
+			<input type="button" id="ok_btn" value="确定" />
+		</div>
+<!-- ==================================代码区=================================================================		 -->
+		
+		<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			
+			
+			var mVue = new Vue({
+				el: '#div_meanu',
+				data: {
+					sites: []
+				}
+			})
+			
+
+			$("#add").click(function(){
+				$("#add_more").toggle()	;	
+				
+			})
+			$("#no_btn").click(function(){
+				$("#add_more").toggle()				
+			})
+			$("#ok_btn").click(function(){
+				$("#add_more").toggle()	
+				mVue.sites.push({name:$("#add_name").val(),addr:$("#add_addr").val()});
+				// console.log(mVue.sites)
+				$.post("addAddr",
+					{
+						data:JSON.stringify({addrArray:mVue.sites})
+					},
+					function(data,status){
+						alert("数据: \n" + data + "\n上传状态: " + status);
+						
+					}
+				);				
+			})			
+/************************************************************/
+			$.get("addr",function(data,status){
+				mVue.sites=data;
+				//alert("获取成功")
+			})
+/***********************************************************/
+			$("#sub").click(function(){
+				// alert("点击图标左上角图标删除")	
+				$(".son_sub_image").toggle()
+				$(".son .son_sub_image").click(function () {
+					var index = $(".son .son_sub_image").index(this);
+					mVue.sites.splice(index,1)
+					
+				});	
+				$.post("addAddr",
+					{
+						data:JSON.stringify({addrArray:mVue.sites})
+					},
+					function(data,status){
+						alert("数据: \n" + data + "\n上传状态: " + status);
+						
+					}
+				);
+			})
+
+		</script>
+	</body>
+</html>
